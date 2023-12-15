@@ -67,9 +67,11 @@ public class LstCofaCredit extends ExtendM3Transaction {
     
   }
   
-  // On vérifie que la DIVI existe
+  /**
+  * On vérifie que la DIVI existe
+  */
   private boolean checkDiviExist() {
-    DBAction query = database.table("CMNDIV").index("00").selection("CCCONM").build()
+    DBAction query = database.table("CMNDIV").index("00").build()
     DBContainer container = query.getContainer()
     container.set("CCCONO", cono)
     container.set("CCDIVI", divi)
@@ -77,7 +79,9 @@ public class LstCofaCredit extends ExtendM3Transaction {
     return query.read(container)
   }
   
-  // Recherche de la liste des clients en filtrant sur CFC8 et CSCD.
+  /**
+  * Recherche de la liste des clients en filtrant sur CFC8 et CSCD.
+  */
   private void searchCustomers() {
     DBAction query = database.table("OCUSMA").index("00").selection("OKCUNO", "OKCFC8", "OKCSCD").build()
     DBContainer container = query.getContainer()
@@ -101,7 +105,9 @@ public class LstCofaCredit extends ExtendM3Transaction {
     query.readAll(container, 1, pageSize, releasedCustomerProcessor)
   }
   
-  // Recherche des factures dans FSLEDG pour les clients trouvés précédemment.
+  /**
+  * Recherche des factures dans FSLEDG pour les clients trouvés précédemment.
+  */
   private searchFsledgEnregs(String cuno) {
     DBAction query = database.table("FSLEDG")
                              .index("40")
@@ -130,13 +136,15 @@ public class LstCofaCredit extends ExtendM3Transaction {
     query.readAll(container, 3, pageSize, releasedFsledgProcessor)
   }
   
-  // recherche du VTXT dans FGLEDG
+  /**
+  * Recherche du VTXT dans FGLEDG
+  */
   private searchFgledg(DBContainer dataFsledg, String cuno) {
     int jrno = (int) dataFsledg.get("ESJRNO")
     int jsno = (int) dataFsledg.get("ESJSNO")
     int yea4 = (int) dataFsledg.get("ESYEA4") 
     
-    DBAction query = database.table("FGLEDG").index("00").selection("EGVTXT").build()
+    DBAction query = database.table("FGLEDG").index("00").build()
     DBContainer container = query.getContainer()
     container.set("EGCONO", cono)
     container.set("EGDIVI", divi)
@@ -148,6 +156,7 @@ public class LstCofaCredit extends ExtendM3Transaction {
       DBContainer data ->
       
       mi.outData.put("VTXT", String.valueOf(data.get("EGVTXT")))
+      mi.outData.put("SENS", String.valueOf(data.get("EGDBCR")))
     }
     
     query.readAll(container, 5, releasedFsledgProcessor)
@@ -168,11 +177,7 @@ public class LstCofaCredit extends ExtendM3Transaction {
     mi.outData.put("RMST", String.valueOf(dataFsledg.get("ESRMST")))
     mi.outData.put("TEPY", String.valueOf(dataFsledg.get("ESTEPY")))
     mi.outData.put("CINO", String.valueOf(dataFsledg.get("ESCINO")))
-    if (cuam >= 0) {
-      mi.outData.put("SENS", "C")
-    } else {
-      mi.outData.put("SENS", "D")
-    }
+ 
     mi.write()
   }
   

@@ -70,7 +70,7 @@ public class ChangeCONO extends ExtendM3Trigger {
   * On vérifie si l'ITNO passé en entrée existe afin de ne pas passer les refs complémentaires existantes dans la CONO 200 pour rien.
   */
   private boolean checkItemExist() {
-    DBAction query = database.table("MITMAS").index("00").selection("MMITDS").build()
+    DBAction query = database.table("MITMAS").index("00").build()
     DBContainer container = query.getContainer()
     container.set("MMCONO", company)
     container.set("MMITNO", transaction.parameters.get("ITNO"))

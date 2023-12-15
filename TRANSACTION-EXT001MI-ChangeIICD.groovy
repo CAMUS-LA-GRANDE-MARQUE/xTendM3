@@ -72,9 +72,11 @@ public class ChangeIICD extends ExtendM3Transaction {
     }
   }
   
-  // On vérifie que la DIVI existe
+  /**
+   * On vérifie que la DIVI existe
+  */
   private boolean checkDiviExist(String divi) {
-    DBAction query = database.table("CMNDIV").index("00").selection("CCCONM").build()
+    DBAction query = database.table("CMNDIV").index("00").build()
     DBContainer container = query.getContainer()
     container.set("CCCONO", cono)
     container.set("CCDIVI", divi)
@@ -82,12 +84,13 @@ public class ChangeIICD extends ExtendM3Transaction {
     return query.read(container)
   }
   
-  // Mise à jour de l'enregistrement
+  /**
+  * Mise à jour de l'enregistrement
+  */
   private void updateFSLEDG(String divi, String yea4, String jrno, String jsno, String iicd) {
-    DBAction query = database.table("FSLEDG").index("00").selection("ESIICD").build()
+    DBAction query = database.table("FSLEDG").index("00").build()
     DBContainer container = query.getContainer()
-    
-    // Champs de la clé
+
     container.set("ESCONO", cono)
     container.set("ESDIVI", divi)
     container.set("ESYEA4", utility.call("NumberUtil","parseStringToInteger", yea4))
@@ -95,45 +98,19 @@ public class ChangeIICD extends ExtendM3Transaction {
     container.set("ESJSNO", utility.call("NumberUtil","parseStringToInteger", jsno))
     
     Closure<?> updateCallBack = { LockedResult lockedResult ->
-      // The change number is retrieved from the existing record and is being added 1
       int chno = lockedResult.get("ESCHNO")
       chno++
-      lockedResult.set("ESLMDT", utility.call("DateUtil","currentDateY8AsInt"))   // Date du jour au format YMD8
-      lockedResult.set("ESCHNO", chno)                                            // Incrément de modification incrémenté de 1
-      lockedResult.set("ESCHID", chid)                                            // Profil de l'utilisateur qui a modifié l'enregistrement
+      lockedResult.set("ESLMDT", utility.call("DateUtil","currentDateY8AsInt"))
+      lockedResult.set("ESCHNO", chno)
+      lockedResult.set("ESCHID", chid)
       lockedResult.set("ESIICD", utility.call("NumberUtil","parseStringToInteger", iicd))
       
       lockedResult.update()
     }
     
-    // If there is an existing record of this key, the fields are set and the record is updated in the table
-    if (query.read(container)) {
-      query.readAllLock(container, 5, updateCallBack) // Pour chaque enregistrement sur la clef trouvée, on le lock et on l'update
-    } else {
-      // If the record doesn't already exist in the table, an error is thrown
+    if (!query.readLock(container, updateCallBack)) {
       mi.error("L'enregistrement n'existe pas.")
-    }
+    } 
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 }
+  
