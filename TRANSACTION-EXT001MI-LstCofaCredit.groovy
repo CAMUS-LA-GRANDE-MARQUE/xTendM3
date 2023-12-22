@@ -144,7 +144,7 @@ public class LstCofaCredit extends ExtendM3Transaction {
     int jsno = (int) dataFsledg.get("ESJSNO")
     int yea4 = (int) dataFsledg.get("ESYEA4") 
     
-    DBAction query = database.table("FGLEDG").index("00").build()
+    DBAction query = database.table("FGLEDG").selection("EGVTXT", "EGDBCR").index("00").build()
     DBContainer container = query.getContainer()
     container.set("EGCONO", cono)
     container.set("EGDIVI", divi)
