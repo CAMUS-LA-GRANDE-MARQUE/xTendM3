@@ -7,6 +7,7 @@
  * Description: 
  * Date       Changed By                     Description
  * 20231221   François Leprévost             Création verbe AddAlias spécifique pour MMS025
+ * 20240103   François Leprévost             On teste si les champs d'entrée ont la valeur null, sinon le .trim() plante lors de l'appel de l'API par EVS100
  */
 public class AddAlias extends ExtendM3Transaction {
   private final MIAPI mi
@@ -27,12 +28,32 @@ public class AddAlias extends ExtendM3Transaction {
   public void main() {
     cono = (Integer) program.getLDAZD().CONO
     chid = program.getUser()
-    String alwt = mi.inData.get("ALWT").trim()
-    String alwq = mi.inData.get("ALWQ").trim()
-    String itno = mi.inData.get("ITNO").trim()
-    String popn = mi.inData.get("POPN").trim()
-    String vfdt = mi.inData.get("VFDT").trim()
-    String alun = mi.inData.get("ALUN").trim()
+    String alwt = ""
+    if (mi.inData.get("ALWT") != null) {
+      alwt = mi.inData.get("ALWT").trim()
+    }
+    
+    String alwq = ""
+    if (mi.inData.get("ALWQ") != null) {
+      alwq = mi.inData.get("ALWQ").trim()
+    }
+    
+    String itno = ""
+    if (mi.inData.get("ITNO") != null) {
+      itno = mi.inData.get("ITNO").trim()
+    }
+    String popn = ""
+    if (mi.inData.get("POPN") != null) {
+      popn = mi.inData.get("POPN").trim()
+    }
+    String vfdt = ""
+    if (mi.inData.get("VFDT") != null) {
+      vfdt = mi.inData.get("VFDT").trim()
+    }
+    String alun = ""
+    if (mi.inData.get("ALUN") != null) {
+      alun = mi.inData.get("ALUN").trim()
+    }
     
     if (alwt.isEmpty()) {
       mi.error("La catgéorie est obligatoire.")
